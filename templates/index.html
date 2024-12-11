@@ -1,0 +1,44 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracking</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Shipment Tracking System</h1>
+    </header>
+    <main>
+        <section id="tracking">
+            <h2>Track Your Shipment</h2>
+            <form id="tracking-form">
+                <label for="tracking-number">Enter Tracking Number:</label>
+                <input type="text" id="tracking-number" name="tracking-number" required>
+                <button type="submit">Track</button>
+            </form>
+            <div id="shipment-info"></div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Shipment Tracking System</p>
+    </footer>
+    <script>
+        document.getElementById('tracking-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const trackingNumber = document.getElementById('tracking-number').value;
+            const response = await fetch(`/api/shipments?tracking_number=${trackingNumber}`);
+            const shipment = await response.json();
+            const shipmentInfoDiv = document.getElementById('shipment-info');
+            shipmentInfoDiv.innerHTML = shipment ? `
+                <p><strong>Status:</strong> ${shipment.status}</p>
+                <p><strong>Origin:</strong> ${shipment.origin}</p>
+                <p><strong>Destination:</strong> ${shipment.destination}</p>
+                <p><strong>Estimated Delivery:</strong> ${shipment.estimated_delivery}</p>
+            ` : '<p>Shipment not found.</p>';
+        });
+    </script>
+</body>
+</html>
