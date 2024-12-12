@@ -36,6 +36,7 @@ CREATE TABLE shipments (
     FOREIGN KEY (current_location_id) REFERENCES locations(id),
     FOREIGN KEY (status_id) REFERENCES statuses(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
+<<<<<<< HEAD
 );
 
 CREATE TABLE feedback (
@@ -47,3 +48,6 @@ CREATE TABLE feedback (
 );
 
 ALTER TABLE users ADD COLUMN role ENUM('admin', 'user') DEFAULT 'user';
+=======
+);
+>>>>>>> 87c6ede71f0343010618bd0d314eddfe385cfbd6
