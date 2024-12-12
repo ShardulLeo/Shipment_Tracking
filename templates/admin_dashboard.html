@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <h1>Admin Dashboard</h1>
+        </div>
+        <nav class="nav">
+            <button class="btn-outline" onclick="location.href='/auth/logout'">Logout</button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="section">
+            <h2>Welcome, Admin!</h2>
+            <p>Use the options below to manage the system:</p>
+            <ul class="dashboard-options">
+                <li><a href="/api/analytics" class="btn-primary">View Analytics</a></li>
+                <li><a href="/auth/logout" class="btn-outline">Logout</a></li>
+            </ul>
+        </section>
+    </main>
+    <section id="admin-search">
+        <h2>Search Shipments</h2>
+        <form id="admin-search-form" class="form">
+            <label for="status">Status:</label>
+            <input type="text" id="status" name="status" placeholder="Delivered, Pending, etc.">
+            <label for="origin">Origin:</label>
+            <input type="text" id="origin" name="origin" placeholder="E.g., New York">
+            <label for="destination">Destination:</label>
+            <input type="text" id="destination" name="destination" placeholder="E.g., Los Angeles">
+            <button type="submit" class="btn-primary">Search</button>
+        </form>
+        <div id="admin-search-results" class="info-box"></div>
+    </section>
+    
+    <script>
+        document.getElementById('admin-search-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const status = document.getElementById('status').value;
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+    
+            try {
+                const response = await fetch(`/admin/search_shipments?status=${encodeURIComponent(status)}&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const results = await response.json();
+                document.getElementById('admin-search-results').innerHTML = JSON.stringify(results, null, 2);
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                document.getElementById('admin-search-results').innerHTML = `<p>${error.message}</p>`;
+            }
+        });
+    </script>
+
+    <section id="predict-cancellation" class="section">
+        <h2>Predict Shipment Cancellation</h2>
+        <form id="predict-form" class="form">
+            <label for="origin">Origin:</label>
+            <input type="text" id="origin" name="origin" required>
+            <label for="destination">Destination:</label>
+            <input type="text" id="destination" name="destination" required>
+            <label for="estimated-delivery">Estimated Delivery Days:</label>
+            <input type="number" id="estimated-delivery" name="estimated_delivery" required>
+            <button type="submit" class="btn-primary">Predict</button>
+        </form>
+        <div id="predict-result" class="info-box"></div>
+    </section>
+    
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                origin: document.getElementById('origin').value,
+                destination: document.getElementById('destination').value,
+                estimated_delivery: document.getElementById('estimated-delivery').value
+            };
+    
+            try {
+                const response = await fetch('/api/predict_cancellation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                document.getElementById('predict-result').innerHTML = result.is_canceled 
+                    ? 'This shipment is likely to be canceled.' 
+                    : 'This shipment is unlikely to be canceled.';
+            } catch (error) {
+                console.error('Prediction error:', error);
+                document.getElementById('predict-result').innerHTML = 'An error occurred.';
+            }
+        });
+    </script>
+    
+    <section id="user-management" class="section">
+        <h2>User Management</h2>
+        <div id="user-list" class="info-box"></div>
+    </section>
+    <script>
+        async function loadUsers() {
+            try {
+                const response = await fetch('/admin/users');
+                const users = await response.json();
+                document.getElementById('user-list').innerHTML = users.map(user =>
+                    `<p>${user.username} (${user.email}) - Role: ${user.role}</p>`
+                ).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        loadUsers();
+    </script>
+    
+    <section id="shipment-history" class="section">
+        <h2>Shipment History & Insights</h2>
+    
+        <div>
+            <h3>Monthly Shipment Volume</h3>
+            <canvas id="monthlyShipmentChart"></canvas>
+        </div>
+    
+        <div>
+            <h3>Shipments Per User</h3>
+            <canvas id="shipmentsPerUserChart"></canvas>
+        </div>
+    
+        <!-- Uncomment if revenue trends are added
+        <div>
+            <h3>Monthly Revenue Trends</h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+        -->
+    </section>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        async function loadShipmentHistory() {
+            try {
+                const response = await fetch('/admin/shipment_history');
+                const data = await response.json();
+    
+                // Monthly Shipment Volume Chart
+                const monthlyShipmentCtx = document.getElementById('monthlyShipmentChart').getContext('2d');
+                new Chart(monthlyShipmentCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.monthly_shipments.map(item => item.month),
+                        datasets: [{
+                            label: 'Shipments',
+                            data: data.monthly_shipments.map(item => item.shipment_count),
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+    
+                // Shipments Per User Chart
+                const shipmentsPerUserCtx = document.getElementById('shipmentsPerUserChart').getContext('2d');
+                new Chart(shipmentsPerUserCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.shipments_per_user.map(item => item.username),
+                        datasets: [{
+                            label: 'Shipments',
+                            data: data.shipments_per_user.map(item => item.shipment_count),
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+    
+                // Uncomment if revenue trends are added
+                /*
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.revenue_trends.map(item => item.month),
+                        datasets: [{
+                            label: 'Revenue',
+                            data: data.revenue_trends.map(item => item.total_revenue),
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+                */
+            } catch (error) {
+                console.error('Error loading shipment history:', error);
+            }
+        }
+    
+        loadShipmentHistory();
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Shipment Tracking System | Powered by Material Design</p>
+    </footer>
+</body>
+</html>
+
+
+
+
+

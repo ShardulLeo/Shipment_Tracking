@@ -1,44 +1,91 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shipment Tracking</title>
+    <meta name="description" content="Track your shipments, search deliveries, and view analytics using the Shipment Tracking System.">
+    <title>Shipment Tracking System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS Styles -->
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
-    <header>
-        <h1>Shipment Tracking System</h1>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <h1>Shipment Tracker</h1>
+        </div>
+        <nav class="nav">
+            <button class="btn-outline" onclick="location.href='/auth/login'" aria-label="Login to your account">Login</button>
+            <button class="btn-filled" onclick="location.href='/auth/register'" aria-label="Register for a new account">Register</button>
+        </nav>
     </header>
+
+    <!-- Hero Section -->
     <main>
-        <section id="tracking">
+        <section class="hero">
+            <div class="hero-text">
+                <h2>Track Your Shipments with Ease</h2>
+                <p>Welcome to our tracking system. Get real-time updates, manage your deliveries, and much more.</p>
+                <button class="btn-primary" onclick="location.href='/auth/login'" aria-label="Get started by logging in">Get Started</button>
+            </div>
+            <div class="hero-image">
+                <img src="/static/images/tracking_art.svg" alt="Illustration of shipment tracking in progress">
+            </div>
+        </section>
+
+        <!-- Tracking Section -->
+        <section id="tracking" class="section">
             <h2>Track Your Shipment</h2>
-            <form id="tracking-form">
+            <form id="tracking-form" class="form" aria-describedby="tracking-info">
                 <label for="tracking-number">Enter Tracking Number:</label>
-                <input type="text" id="tracking-number" name="tracking-number" required>
-                <button type="submit">Track</button>
+                <input type="text" id="tracking-number" name="tracking-number" placeholder="E.g., 123456789" required>
+                <button type="submit" class="btn-primary">Track</button>
             </form>
-            <div id="shipment-info"></div>
+            <div id="shipment-info" class="info-box" role="alert" aria-live="polite"></div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section">
+            <h2>Analytics Dashboard</h2>
+            <canvas id="statusChart" role="img" aria-label="Analytics dashboard chart showing shipment statuses"></canvas>
+        </section>
+
+        <!-- Route Optimization Section -->
+        <section id="route-optimization" class="section">
+            <h2>Route Optimization</h2>
+            <form id="route-form" class="form" aria-describedby="route-details">
+                <label for="origin-route">Origin:</label>
+                <input type="text" id="origin-route" name="origin" placeholder="E.g., New York" required>
+                <label for="destination-route">Destination:</label>
+                <input type="text" id="destination-route" name="destination" placeholder="E.g., Los Angeles" required>
+                <button type="submit" class="btn-primary">Optimize Route</button>
+            </form>
+            <div id="route-details" class="info-box" role="alert" aria-live="polite"></div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section id="feedback" class="section">
+            <h2>Submit Feedback</h2>
+            <form id="feedback-form" class="form" aria-describedby="feedback-response">
+                <label for="message">Your Feedback:</label>
+                <textarea id="message" name="message" placeholder="Write your feedback here..." required maxlength="500"></textarea>
+                <button type="submit" class="btn-primary">Submit</button>
+            </form>
+            <div id="feedback-response" class="info-box" role="alert" aria-live="polite"></div>
         </section>
     </main>
+
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Shipment Tracking System</p>
+        <p>&copy; 2024 Shipment Tracking System | Powered by Material Design</p>
     </footer>
-    <script>
-        document.getElementById('tracking-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const trackingNumber = document.getElementById('tracking-number').value;
-            const response = await fetch(`/api/shipments?tracking_number=${trackingNumber}`);
-            const shipment = await response.json();
-            const shipmentInfoDiv = document.getElementById('shipment-info');
-            shipmentInfoDiv.innerHTML = shipment ? `
-                <p><strong>Status:</strong> ${shipment.status}</p>
-                <p><strong>Origin:</strong> ${shipment.origin}</p>
-                <p><strong>Destination:</strong> ${shipment.destination}</p>
-                <p><strong>Estimated Delivery:</strong> ${shipment.estimated_delivery}</p>
-            ` : '<p>Shipment not found.</p>';
-        });
-    </script>
+
+    <!-- JavaScript -->
+    <script src="/static/scripts.js" defer></script>
 </body>
 </html>

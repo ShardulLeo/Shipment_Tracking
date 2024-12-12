@@ -37,3 +37,13 @@ CREATE TABLE shipments (
     FOREIGN KEY (status_id) REFERENCES statuses(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE feedback (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+ALTER TABLE users ADD COLUMN role ENUM('admin', 'user') DEFAULT 'user';

@@ -1,5 +1,6 @@
 import mysql.connector
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+from flask import current_app
 
 def get_db_connection():
     return mysql.connector.connect(

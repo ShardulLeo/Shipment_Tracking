@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header .welcome {
+            font-size: 1.2rem;
+        }
+        .header button {
+            background-color: white;
+            color: #4CAF50;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .header button:hover {
+            background-color: #45a049;
+            color: white;
+        }
+        .content {
+            padding: 2rem;
+            text-align: center;
+        }
+        .content button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .content button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="welcome">
+            Welcome, {{ username }}
+        <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </header>
+    <div class="content">
+        <h1>Welcome, {{ username }}</h1>
+        <h2>Your Shipments</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tracking Number</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Status</th>
+                    <th>Estimated Delivery</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shipment in shipments %}
+                <tr>
+                    <td>{{ shipment.tracking_number }}</td>
+                    <td>{{ shipment.origin }}</td>
+                    <td>{{ shipment.destination }}</td>
+                    <td>{{ shipment.status }}</td>
+                    <td>{{ shipment.estimated_delivery }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</body>
+</html>
