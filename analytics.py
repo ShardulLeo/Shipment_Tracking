@@ -43,7 +43,7 @@ def optimize_route():
         return jsonify({'error': 'Both origin and destination are required.'}), 400
 
     try:
-        api_key = os.getenv('AIzaSyBs4-hYnPbLd0jwK8fFxpwfFvbqQ3LfJ6k')  # Replace with your environment variable
+        api_key = os.getenv('YOUR-KEYS')  # Replace with your environment variable
         url = f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&key={api_key}"
         response = requests.get(url)
 
