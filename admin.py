@@ -3,7 +3,7 @@ from utils.db_utils import get_db_connection
 
 admin_bp = Blueprint('admin', __name__)
 
-@admin_bp.route('/users', methods=['GET'])
+@admin_bp.route('/users', methods=['GET']) 
 def manage_users():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
